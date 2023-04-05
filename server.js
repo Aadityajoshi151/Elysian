@@ -103,6 +103,17 @@ app.post('/update_bookmark', express.json(), (req, res) => {
     });
   });
   
+  app.post('/import_bookmarks', express.json(), (req, res) => {
+    jsonData = req.body;
+    writeDataFile(jsonData, (err) => {
+      if (err) {Data
+        res.status(500).send('Error writing data file');
+        return;
+      }
+      // Send a success response
+      res.send('Bookmarks imported successfully');
+    });
+  })
 
 // Start the Express.js server
 app.listen(3000, () => {
