@@ -50,7 +50,7 @@ app.post('/add_bookmark', express.json(), (req, res) => {
       res.status(500).send('Error reading data file');
       return;
     }
-    bookmark = {id: req.body.id, url: req.body.url}
+    bookmark = req.body
     console.log(bookmark)
     // Add the JSON object from the request body to the data array
     jsonData.bookmarks.push(bookmark);
@@ -117,5 +117,5 @@ app.post('/update_bookmark', express.json(), (req, res) => {
 
 // Start the Express.js server
 app.listen(3000, () => {
-  console.log('Server listening on port 3000');
+  console.log('Elysian is at your service on port 3000');
 });
