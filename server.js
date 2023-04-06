@@ -63,14 +63,12 @@ app.post('/add_bookmark', express.json(), (req, res) => {
         }
   
         // Send a success response
-        res.send('Bookmark added successfully');
+        res.status(201).send('Bookmark added successfully');
       });
   });
 });
 
 app.post('/update_bookmark', express.json(), (req, res) => {
-    const id = req.body.id;
-    const new_url = req.body.url;
   
     readDataFile((err, jsonData) => {
       if (err) {
@@ -79,7 +77,7 @@ app.post('/update_bookmark', express.json(), (req, res) => {
       }
   
       // Find the object with the specified ID in the data array
-      const dataToUpdate = jsonData.bookmarks.find(item => item.id === id);
+      const dataToUpdate = jsonData.bookmarks.find(item => item.id === req.body.id);
   
       if (!dataToUpdate) {
         res.status(404).send('Data not found');
@@ -89,7 +87,8 @@ app.post('/update_bookmark', express.json(), (req, res) => {
       // Update the key-value pair in the object
       console.log(dataToUpdate)
       console.log(dataToUpdate.url)
-      dataToUpdate.url = new_url
+      dataToUpdate.url = req.body.url;
+      dataToUpdate.title = req.body.title
   
       // Write the updated JSON data to the file
       writeDataFile(jsonData, (err) => {
@@ -98,7 +97,7 @@ app.post('/update_bookmark', express.json(), (req, res) => {
           return;
         }
         // Send a success response
-        res.send('Bookmark added successfully');
+        res.status(201).send('Bookmark updated successfully');
       });
     });
   });
