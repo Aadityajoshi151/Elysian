@@ -127,7 +127,7 @@ app.post('/update_bookmark', express.json(), (req, res) => {
           return;
         }
         // Send a success response
-        res.status(201).send('Bookmark updated successfully');
+        res.status(200).send('Bookmark updated successfully');
       });
     });
   });
@@ -145,20 +145,19 @@ app.post('/delete_bookmark', express.json(), (req, res) =>{
           return;
         }
         // Send a success response
-        res.status(201).send('Bookmark deleted successfully');
+        res.status(410).send('Bookmark deleted successfully');
       });
     })
   })
   
-  app.post('/import_bookmarks', express.json(), (req, res) => {
+  app.post('/export_to_elysian', express.json(), (req, res) => {
     jsonData = req.body;
     writeDataFile(flattenBookmarks(jsonData), (err) => {
       if (err) {Data
         res.status(500).send('Error writing data file');
         return;
       }
-      
-      res.send('Bookmarks imported successfully');
+      res.status(200).send('Bookmarks imported successfully');
     });
   })
 
