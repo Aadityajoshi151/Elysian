@@ -3,6 +3,30 @@ const fs = require('fs');
 
 const app = express();
 
+function flattenBookmarks(data) {
+  const flattened = [];
+  function flattenRecursively(bookmarks, parentId) {
+    bookmarks.forEach(bookmark => {
+      const flatBookmark = {
+        id: bookmark.id,
+        parentId,
+        title: bookmark.title,
+        index: bookmark.index,
+        dateAdded: bookmark.dateAdded,
+      };
+      if (bookmark.url) {
+        flatBookmark.url = bookmark.url;
+      }
+      flattened.push(flatBookmark);
+      if (bookmark.children) {
+        flattenRecursively(bookmark.children, bookmark.id);
+      }
+    });
+  }
+  flattenRecursively(data.bookmarks, 2);
+  return flattened;
+}
+
 // Define a function to read the local JSON file
 function readDataFile(callback) {
   fs.readFile('bookmarks.json', 'utf8', (err, data) => {
@@ -101,15 +125,24 @@ app.post('/update_bookmark', express.json(), (req, res) => {
       });
     });
   });
+
+app.post('/delete_bookmark', express.json(), (req, res) =>{
+    readDataFile((err, jsonData) => {
+      if (err) {
+        res.status(500).send('Error reading data file');
+        return;
+      }
+    })
+  })
   
   app.post('/import_bookmarks', express.json(), (req, res) => {
     jsonData = req.body;
-    writeDataFile(jsonData, (err) => {
+    writeDataFile(flattenBookmarks(jsonData), (err) => {
       if (err) {Data
         res.status(500).send('Error writing data file');
         return;
       }
-      // Send a success response
+      
       res.send('Bookmarks imported successfully');
     });
   })
