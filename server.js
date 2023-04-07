@@ -132,6 +132,15 @@ app.post('/delete_bookmark', express.json(), (req, res) =>{
         res.status(500).send('Error reading data file');
         return;
       }
+      jsonData = jsonData.filter(bookmark => bookmark.id !== String(req.body.id));
+      writeDataFile(jsonData, (err) => {
+        if (err) {Data
+          res.status(500).send('Error writing data file');
+          return;
+        }
+        // Send a success response
+        res.status(201).send('Bookmark deleted successfully');
+      });
     })
   })
   
