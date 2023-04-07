@@ -77,7 +77,7 @@ app.post('/add_bookmark', express.json(), (req, res) => {
     bookmark = req.body
     console.log(bookmark)
     // Add the JSON object from the request body to the data array
-    jsonData.bookmarks.push(bookmark);
+    jsonData.push(bookmark);
 
     // Write the updated JSON data to the file
     writeDataFile(jsonData, (err) => {
@@ -101,7 +101,7 @@ app.post('/update_bookmark', express.json(), (req, res) => {
       }
   
       // Find the object with the specified ID in the data array
-      const dataToUpdate = jsonData.bookmarks.find(item => item.id === req.body.id);
+      const dataToUpdate = jsonData.find(item => item.id === req.body.id);
   
       if (!dataToUpdate) {
         res.status(404).send('Data not found');
