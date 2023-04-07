@@ -107,12 +107,18 @@ app.post('/update_bookmark', express.json(), (req, res) => {
         res.status(404).send('Data not found');
         return;
       }
-  
-      // Update the key-value pair in the object
       console.log(dataToUpdate)
-      console.log(dataToUpdate.url)
-      dataToUpdate.url = req.body.url;
+      // Update the key-value pair in the object
+      if (req.body.url && req.body.title){  //updating a bookmark
+        dataToUpdate.url = req.body.url;
       dataToUpdate.title = req.body.title
+      }
+      else{ //reordering a bookmark
+        dataToUpdate.index = req.body.index;
+        dataToUpdate.parentId = req.body.parentId;
+      }
+      
+      
   
       // Write the updated JSON data to the file
       writeDataFile(jsonData, (err) => {
