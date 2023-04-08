@@ -79,7 +79,6 @@ app.get('/bookmarks', (req, res) => {
 
 // Define a POST route to add a JSON object to the local JSON file
 app.post('/add_bookmark', express.json(), (req, res) => {
-  console.log(req.get("Authorization"))
   if (!isAuthorized(req.get("Authorization"))){
     res.status(401).send('Unauthorized request');
     return;
@@ -90,7 +89,6 @@ app.post('/add_bookmark', express.json(), (req, res) => {
       return;
     }
     bookmark = req.body
-    console.log(bookmark)
     // Add the JSON object from the request body to the data array
     jsonData.push(bookmark);
 
@@ -125,7 +123,6 @@ app.post('/update_bookmark', express.json(), (req, res) => {
         res.status(404).send('Data not found');
         return;
       }
-      console.log(dataToUpdate)
       // Update the key-value pair in the object
       if (req.body.url && req.body.title){  //updating a bookmark
         dataToUpdate.url = req.body.url;
