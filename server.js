@@ -73,7 +73,7 @@ app.get('/bookmarks', (req, res) => {
     }
 
     // Send the JSON data as the response
-    res.send(jsonData);
+    res.status(200).send(jsonData);
   });
 });
 
