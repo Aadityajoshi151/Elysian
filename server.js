@@ -1,7 +1,9 @@
 const express = require('express');
 const fs = require('fs');
-
+require('dotenv').config();
 const app = express();
+
+const API_KEY = process.env.ELYSIAN_API_KEY
 
 function flattenBookmarks(data) {
   const flattened = [];
@@ -25,6 +27,10 @@ function flattenBookmarks(data) {
   }
   flattenRecursively(data.bookmarks, 2);
   return flattened;
+}
+
+function isAuthorized(key){
+  return (key === API_KEY ? true : false);
 }
 
 // Define a function to read the local JSON file
@@ -56,6 +62,10 @@ function writeDataFile(jsonData, callback) {
 
 // Define a GET route to read the local JSON file
 app.get('/bookmarks', (req, res) => {
+  if (!isAuthorized(req.get("Authorization"))){
+    res.status(401).send('Unauthorized request');
+    return;
+  }
   readDataFile((err, jsonData) => {
     if (err) {
       res.status(500).send('Error reading data file');
@@ -69,6 +79,11 @@ app.get('/bookmarks', (req, res) => {
 
 // Define a POST route to add a JSON object to the local JSON file
 app.post('/add_bookmark', express.json(), (req, res) => {
+  console.log(req.get("Authorization"))
+  if (!isAuthorized(req.get("Authorization"))){
+    res.status(401).send('Unauthorized request');
+    return;
+  }
   readDataFile((err, jsonData) => {
     if (err) {
       res.status(500).send('Error reading data file');
@@ -93,7 +108,10 @@ app.post('/add_bookmark', express.json(), (req, res) => {
 });
 
 app.post('/update_bookmark', express.json(), (req, res) => {
-  
+  if (!isAuthorized(req.get("Authorization"))){
+    res.status(401).send('Unauthorized request');
+    return;
+  }
     readDataFile((err, jsonData) => {
       if (err) {
         res.status(500).send('Error reading data file');
@@ -133,6 +151,10 @@ app.post('/update_bookmark', express.json(), (req, res) => {
   });
 
 app.post('/delete_bookmark', express.json(), (req, res) =>{
+  if (!isAuthorized(req.get("Authorization"))){
+    res.status(401).send('Unauthorized request');
+    return;
+  }
     readDataFile((err, jsonData) => {
       if (err) {
         res.status(500).send('Error reading data file');
@@ -151,6 +173,10 @@ app.post('/delete_bookmark', express.json(), (req, res) =>{
   })
   
   app.post('/export_to_elysian', express.json(), (req, res) => {
+    if (!isAuthorized(req.get("Authorization"))){
+      res.status(401).send('Unauthorized request');
+      return;
+    }
     jsonData = req.body;
     writeDataFile(flattenBookmarks(jsonData), (err) => {
       if (err) {Data
