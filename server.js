@@ -214,6 +214,17 @@ app.post('/export_to_elysian', express.json(), (req, res) => {
   });
 })
 
+app.post('/checkauth', express.json(), (req, res) => {
+  if (!isAuthorized(req.get("Authorization"))) {
+    res.status(401).send('Unauthorized request');
+    return;
+  }
+  else{
+    res.status(200).send('Authentication sucessful');
+  }
+    
+  });
+
 // Start the Express.js server
 app.listen(3000, () => {
   console.log('Elysian is at your service on port 3000');
