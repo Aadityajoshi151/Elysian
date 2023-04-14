@@ -4,3 +4,5 @@ bookmarks copy.json
 credentials.json
 flatten.js
 *.env
+*.yaml
+/data

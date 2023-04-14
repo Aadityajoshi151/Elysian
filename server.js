@@ -2,7 +2,7 @@ const express = require('express');
 const fs = require('fs');
 require('dotenv').config();
 const app = express();
-
+require('./database');
 const API_KEY = process.env.ELYSIAN_API_KEY
 
 function flattenBookmarks(data) {
