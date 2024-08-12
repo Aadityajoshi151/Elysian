@@ -1,17 +1,128 @@
 const express = require('express');
 const fs = require('fs');
 require('dotenv').config();
+const { MongoClient } = require('mongodb');
 const app = express();
+const path = require('path');
+
+const uri = 'mongodb://localhost:27017'; // Replace with your MongoDB connection URI
+const client = new MongoClient(uri);
+
+// async function connectToDatabase() {
+//   console.log("inside db conn")
+//   try {
+//     await client.connect();
+//     console.log('Connected to the database');
+//   } catch (error) {
+//     console.error('Error connecting to the database:', error);
+//   }
+// }
+
+// connectToDatabase();
 
 const API_KEY = process.env.ELYSIAN_API_KEY
 
+let elementRoot = null;
+
+// Bookmark tree data structure
+let bookmarkTree = null;
+
+// Set the root DOM element
+function setElementRoot(elementRootNode) {
+    elementRoot = elementRootNode;
+}
+
+// Set the bookmark tree data structure
+function setBookmarkTree(bookmarkTreeData) {
+    bookmarkTree = bookmarkTreeData;
+}
+
+// Render the bookmark tree
+function render() {
+    const root = document.createElement("ul");
+    const tree = walkTree(bookmarkTree);
+    tree.querySelector("span").innerText = "/"; // Root node has no title
+    root.appendChild(tree);
+    elementRoot.appendChild(root);
+}
+
+// Get selected bookmarks' IDs
+function getSelectedBookmarksId() {
+    return getSelectedBookmarksIdFrom(elementRoot);
+}
+
+// Teardown the bookmark tree from the DOM
+function teardown() {
+    const bookmarkTreeElement = elementRoot.querySelector("ul");
+    if (bookmarkTreeElement) {
+        bookmarkTreeElement.remove();
+    }
+}
+
+// Recursively walk through the bookmark tree
+function walkTree(bookmark) {
+    let listItem = null;
+    if (isExportableNode(bookmark)) {
+        listItem = createListItem(bookmark.title, bookmark.id);
+        if (bookmark.children) {
+            const children = document.createElement("ul");
+            for (const child of bookmark.children) {
+                const childNode = walkTree(child);
+                if (childNode) {
+                    children.appendChild(childNode);
+                }
+            }
+            listItem.appendChild(children);
+        }
+    }
+    return listItem;
+}
+
+// Check if a node is exportable (i.e., not an empty folder or horizontal line)
+function isExportableNode(bookmark) {
+    return bookmark.children || bookmark.title;
+}
+
+// Placeholder function for creating a list item (should be customized as needed)
+function createListItem(title, id) {
+    const listItem = document.createElement("li");
+    listItem.textContent = title || "(Untitled)";
+    listItem.dataset.id = id;
+    return listItem;
+}
+
+// Placeholder function for getting selected bookmarks' IDs (should be customized as needed)
+function getSelectedBookmarksIdFrom(element) {
+    const selectedItems = element.querySelectorAll('li.selected');
+    return Array.from(selectedItems).map(item => item.dataset.id);
+}
+
+// Write bookmark data to a JSON file
+function writeDataFile(jsonData) {
+    const filePath = path.join(__dirname, 'bookmarks.json');
+
+    // Convert the JSON string back to an object for validation if necessary
+    //const data = JSON.stringify(jsonData);
+
+    // Write the data to a JSON file
+    fs.writeFileSync(filePath, JSON.stringify(jsonData, null, 2), 'utf-8');
+
+    console.log(`Bookmarks have been saved to ${filePath}`);
+}
+
+
+
+
+
 function flattenBookmarks(data) {
+  console.log("9")
+  console.log(data)
   const flattened = [];
   function flattenRecursively(bookmarks, parentId) {
     bookmarks.forEach(bookmark => {
       const flatBookmark = {
         id: bookmark.id,
-        parentId,
+        parentId: bookmark.parentId,
         title: bookmark.title,
         index: bookmark.index,
         dateAdded: bookmark.dateAdded,
@@ -48,17 +159,17 @@ function readDataFile(callback) {
   });
 }
 
-function writeDataFile(jsonData, callback) {
-  fs.writeFile('bookmarks.json', JSON.stringify(jsonData), (err) => {
-    if (err) {
-      console.error(err);
-      callback(err);
-      return;
-    }
+// function writeDataFile(jsonData, callback) {
+//   fs.writeFile('bookmarks.json', JSON.stringify(jsonData), (err) => {
+//     if (err) {
+//       console.error(err);
+//       callback(err);
+//       return;
+//     }
 
-    callback(null);
-  });
-}
+//     callback(null);
+//   });
+// }
 
 // Define a GET route to read the local JSON file
 app.get('/bookmarks', (req, res) => {
@@ -77,31 +188,90 @@ app.get('/bookmarks', (req, res) => {
   });
 });
 
+
+function readBookmarksFile() {
+  fs.readFile('bookmarks.json', 'utf8', (err, data) => {
+    console.log(data)
+    if (err) {
+      console.error(err);
+      return;
+    }
+
+    // Parse the JSON data
+    const jsonData = JSON.parse(data);
+    return jsonData;
+  });
+}
+
+function writeBookmarksFile(bookmarks) {
+  const filePath = path.join(__dirname, 'bookmarks.json')
+  return new Promise((resolve, reject) => {
+      fs.writeFile(filePath, JSON.stringify(bookmarks, null, 2), 'utf-8', (err) => {
+          if (err) {
+              return reject(new Error('Failed to write bookmarks file'));
+          }
+          resolve();
+      });
+  });
+}
+
+function addBookmarkToHierarchy(bookmarks, newBookmark) {
+  const { id, parentId } = newBookmark;
+
+  function findAndInsert(parentId, bookmarks) {
+      for (const bookmark of bookmarks) {
+          if (bookmark.id === parentId) {
+              if (!bookmark.children) {
+                  bookmark.children = [];
+              }
+              bookmark.children.push(newBookmark);
+              return true;
+          }
+          if (bookmark.children) {
+              if (findAndInsert(parentId, bookmark.children)) {
+                  return true;
+              }
+          }
+      }
+      return false;
+  }
+
+  if (!findAndInsert(parentId, bookmarks)) {
+      console.error('Parent ID not found');
+  }
+
+  return bookmarks;
+}
+
 // Define a POST route to add a JSON object to the local JSON file
 app.post('/add_bookmark', express.json(), (req, res) => {
   if (!isAuthorized(req.get("Authorization"))) {
     res.status(401).send('Unauthorized request');
     return;
   }
-  readDataFile((err, jsonData) => {
+  readDataFile(async (err, jsonData) => {
     if (err) {
       res.status(500).send('Error reading data file');
       return;
     }
-    bookmark = req.body
-    // Add the JSON object from the request body to the data array
-    jsonData.push(bookmark);
+    newbookmark = req.body
+    console.log(newbookmark)
+    try {
+      // Read the existing bookmarks file
+      const bookmarks = readBookmarksFile();
 
-    // Write the updated JSON data to the file
-    writeDataFile(jsonData, (err) => {
-      if (err) {
-        res.status(500).send('Error writing data file');
-        return;
-      }
+      console.log(bookmarks)
 
-      // Send a success response
-      res.status(201).send('Bookmark added successfully');
-    });
+      // Insert the new bookmark into the correct hierarchical place
+      const updatedBookmarks = addBookmarkToHierarchy(bookmarks, newBookmark);
+
+      // Write the updated bookmarks back to the file
+      writeDataFile(updatedBookmarks);
+
+      res.status(200).json({ message: 'Bookmark added successfully' });
+  } catch (error) {
+      res.status(500).json({ error: error.message });
+  }
   });
 });
 
@@ -204,9 +374,10 @@ app.post('/export_to_elysian', express.json(), (req, res) => {
     return;
   }
   jsonData = req.body;
-  writeDataFile(flattenBookmarks(jsonData), (err) => {
+  console.log(jsonData)
+  writeDataFile(jsonData, (err) => {
     if (err) {
-      Data
+      //Data
       res.status(500).send('Error writing data file');
       return;
     }
@@ -224,6 +395,32 @@ app.post('/checkauth', express.json(), (req, res) => {
   }
     
   });
+
+  app.get('/import_from_elysian', express.json(), (req, res) => {
+    if (!isAuthorized(req.get("Authorization"))) {
+      res.status(401).send('Unauthorized request');
+      return;
+    }
+    else{
+      const filePath = path.join(__dirname, 'bookmarks.json');
+
+      // Read the JSON file
+      const fileData = fs.readFileSync(filePath, 'utf-8');
+      console.log(fileData)
+      //const bookmarksData = JSON.parse(fileData);
+      //console.log(bookmarksData)
+      //res.send(fileData);
+      res.json(JSON.parse(fileData))
+    }
+
+      
+    });
+  
+
+
+
+
+
 
 // Start the Express.js server
 app.listen(3000, () => {
