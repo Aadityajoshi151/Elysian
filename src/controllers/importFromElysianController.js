@@ -1,8 +1,9 @@
-//const writeFile = require('../utils/writeFile');
+const readFile = require('../utils/readFile');
 
 const handleImportFromElysian = (req, res) => {
-    console.log("import success")
-    res.json({ message: 'Import successful' });
+    bookmarks = readFile.readBookmarksFile()
+    console.log(bookmarks)
+    res.json(JSON.parse(bookmarks))
 };
 
 module.exports = {
