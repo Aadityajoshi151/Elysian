@@ -1,8 +1,7 @@
 const writeFile = require('../utils/writeFile');
 
 const handleExportToElysian = (req, res) => {
-    // Logic for handling export
-    writeFile.createBookmarksFile()
+    writeFile.createBookmarksFile(JSON.stringify(req.body))
     res.json({ message: 'Export successful' });
 };
 
