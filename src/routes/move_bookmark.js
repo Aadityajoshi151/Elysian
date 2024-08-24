@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const moveBookmarkController = require('../controllers/moveBookmarkController');
+const exportToElysianController = require('../controllers/exportToElysianController');
 
-router.post('/', express.json(), moveBookmarkController.handleMoveBookmark);
+router.post('/', express.json(), exportToElysianController.handleExportToElysian);
 
 module.exports = router;
