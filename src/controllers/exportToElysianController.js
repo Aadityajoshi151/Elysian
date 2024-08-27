@@ -9,7 +9,6 @@ const handleExportToElysian = (req, res) => {
     else{
         res.status(401).json('Unauthorized');
     }
-
 };
 
 module.exports = {
