@@ -1,9 +1,14 @@
 const readFile = require('../utils/readFile');
+const authCheck = require('../utils/authCheck');
 
 const handleImportFromElysian = (req, res) => {
-    bookmarks = readFile.readBookmarksFile()
-    console.log(bookmarks)
-    res.json(JSON.parse(bookmarks))
+    if (authCheck.isAuthorized(req.headers.authorization)){
+        bookmarks = readFile.readBookmarksFile()
+        res.status(200).json(JSON.parse(bookmarks))
+    }
+    else{
+        res.status(401).json('Unauthorized');
+    }
 };
 
 module.exports = {
