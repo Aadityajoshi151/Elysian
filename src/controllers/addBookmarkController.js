@@ -1,5 +1,6 @@
 const readFile = require('../utils/readFile');
 const writeFile = require('../utils/writeFile');
+const authCheck = require('../utils/authCheck');
 
 
 function addChildBookmark(bookmarks, new_bookmark) {
@@ -23,18 +24,23 @@ function addChildBookmark(bookmarks, new_bookmark) {
 }
 
 const handleAddBookmark = (req, res) => {
-    bookmarks = readFile.readBookmarksFile()
-    bookmarks = JSON.parse(bookmarks)
-    if (req.body.parentId === '1') {
-        bookmarks.push(req.body)
+    if (authCheck.isAuthorized(req.headers.authorization)){
+        bookmarks = readFile.readBookmarksFile()
+        bookmarks = JSON.parse(bookmarks)
+        if (req.body.parentId === '1') {
+            bookmarks.push(req.body)
+        }
+        else {
+            //TODO Add error handling
+            //result will be true or false if bookmark added or not
+            result = addChildBookmark(bookmarks, req.body)
+        }
+        writeFile.createBookmarksFile(JSON.stringify(bookmarks))
+        res.status(200).json('Bookmark Added');
     }
-    else {
-        //TODO Add error handling
-        //result will be true or false if bookmark added or not
-        result = addChildBookmark(bookmarks, req.body)
+    else{
+        res.status(401).json('Unauthorized');
     }
-    writeFile.createBookmarksFile(JSON.stringify(bookmarks))
-    res.json({ message: 'Bookmark Added' });
 };
 
 module.exports = {
