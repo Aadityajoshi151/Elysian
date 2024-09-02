@@ -1,5 +1,6 @@
 const readFile = require('../utils/readFile');
 const writeFile = require('../utils/writeFile');
+const authCheck = require('../utils/authCheck');
 
 function updateChildBookmark(bookmarks, new_bookmark){
     //TODO Add return statements during error handling
@@ -21,11 +22,16 @@ function updateChildBookmark(bookmarks, new_bookmark){
 }
 
 const handleUpdateBookmark = (req, res) => {
-    bookmarks = readFile.readBookmarksFile()
-    bookmarks = JSON.parse(bookmarks)
-    updateChildBookmark(bookmarks, req.body)
-    writeFile.createBookmarksFile(JSON.stringify(bookmarks))
-    res.json({ message: 'Bookmark Updated' });
+    if (authCheck.isAuthorized(req.headers.authorization)){
+        bookmarks = readFile.readBookmarksFile()
+        bookmarks = JSON.parse(bookmarks)
+        updateChildBookmark(bookmarks, req.body)
+        writeFile.createBookmarksFile(JSON.stringify(bookmarks))
+        res.status(200).json({ message: 'Bookmark Updated' });
+    }
+    else{
+        res.status(401).json('Unauthorized');
+    }
 };
 
 module.exports = {
