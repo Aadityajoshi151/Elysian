@@ -12,6 +12,9 @@ function addChildBookmark(bookmarks, new_bookmark) {
             }
             new_bookmark.index = node.children.length;
             node.children.push(new_bookmark);
+            console.group(addChildBookmark.name + ': Folder/Nested Bookmark added')
+            console.log(node.children)
+            console.groupEnd()
             return true; // bookmark added successfully
         }
         //Recursion
@@ -24,22 +27,32 @@ function addChildBookmark(bookmarks, new_bookmark) {
 }
 
 const handleAddBookmark = (req, res) => {
-    if (authCheck.isAuthorized(req.headers.authorization)){
-        bookmarks = readFile.readBookmarksFile()
-        bookmarks = JSON.parse(bookmarks)
-        if (req.body.parentId === '1') {
-            bookmarks.push(req.body)
+    try {
+        if (authCheck.isAuthorized(req.headers.authorization)) {
+            bookmarks = readFile.readBookmarksFile()
+            bookmarks = JSON.parse(bookmarks)
+            if (req.body.parentId === '1') {
+                bookmarks.push(req.body)
+                console.group(handleAddBookmark.name + ': Bookmark added to bookmarks bar')
+                console.log(req.body)
+                console.groupEnd()
+            }
+            else {
+                result = addChildBookmark(bookmarks, req.body)
+                if (result == false) {
+                    console.error(handleAddBookmark.name + ': Bookmark not added. ParentID not found')
+                }
+            }
+            writeFile.createBookmarksFile(JSON.stringify(bookmarks))
+            res.status(201).json('Bookmark Added');
         }
         else {
-            //TODO Add error handling
-            //result will be true or false if bookmark added or not
-            result = addChildBookmark(bookmarks, req.body)
+            res.status(401).json('Unauthorized');
+            console.error(handleAddBookmark.name + ': Unauthorized')
         }
-        writeFile.createBookmarksFile(JSON.stringify(bookmarks))
-        res.status(200).json('Bookmark Added');
     }
-    else{
-        res.status(401).json('Unauthorized');
+    catch (err) {
+        console.error(handleAddBookmark.name + ': ' + err)
     }
 };
 
