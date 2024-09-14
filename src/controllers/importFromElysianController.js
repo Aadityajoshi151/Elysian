@@ -2,12 +2,19 @@ const readFile = require('../utils/readFile');
 const authCheck = require('../utils/authCheck');
 
 const handleImportFromElysian = (req, res) => {
-    if (authCheck.isAuthorized(req.headers.authorization)){
-        bookmarks = readFile.readBookmarksFile()
-        res.status(200).json(JSON.parse(bookmarks))
+    try {
+        if (authCheck.isAuthorized(req.headers.authorization)) {
+            bookmarks = readFile.readBookmarksFile()
+            res.status(200).json(JSON.parse(bookmarks))
+            console.log(handleImportFromElysian.name + ': Sent bookmarks to Elysian extension')
+        }
+        else {
+            res.status(401).json('Unauthorized');
+            console.error(handleImportFromElysian.name + ': Unauthorized')
+        }
     }
-    else{
-        res.status(401).json('Unauthorized');
+    catch (err) {
+        console.error(handleImportFromElysian.name + ': ' + err)
     }
 };
 

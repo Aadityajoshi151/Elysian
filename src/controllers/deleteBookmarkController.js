@@ -7,6 +7,9 @@ function deleteChildNode(bookmarks, id_to_be_deleted) {
         const node = bookmarks[i];
         if (node.id === id_to_be_deleted) {
             bookmarks.splice(i, 1);
+            console.group(handleDeleteBookmark.name + ': Bookmark(s) Deleted')
+            console.log(node)
+            console.groupEnd()
             i--;
             continue;
         }
@@ -19,17 +22,21 @@ function deleteChildNode(bookmarks, id_to_be_deleted) {
 
 
 const handleDeleteBookmark = (req, res) => {
-    if (authCheck.isAuthorized(req.headers.authorization)){
-        bookmarks = readFile.readBookmarksFile()
-        bookmarks = JSON.parse(bookmarks)
-        //TODO Add error handling
-        //result will be true or false if bookmark deleted or not
-        result = deleteChildNode(bookmarks, req.body.id)
-        writeFile.createBookmarksFile(JSON.stringify(result))
-        res.status(200).json({ message: 'Bookmark Deleted' });      
+    try {
+        if (authCheck.isAuthorized(req.headers.authorization)) {
+            bookmarks = readFile.readBookmarksFile()
+            bookmarks = JSON.parse(bookmarks)
+            result = deleteChildNode(bookmarks, req.body.id)
+            writeFile.createBookmarksFile(JSON.stringify(result))
+            res.status(200).json({ message: 'Bookmark Deleted' });
+        }
+        else {
+            res.status(401).json('Unauthorized');
+            console.error(handleDeleteBookmark.name + ': Unauthorized')
+        }
     }
-    else{
-        res.status(401).json('Unauthorized');
+    catch (err) {
+        console.error(handleDeleteBookmark.name + ': ' + err)
     }
 };
 
