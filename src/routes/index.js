@@ -1,3 +1,5 @@
+//Containers the different routes for the project
+
 const express = require('express');
 const router = express.Router();
 
@@ -8,7 +10,7 @@ const delete_bookmark_routes = require('./delete_bookmark')
 const update_bookmark_routes = require('./update_bookmark')
 const move_bookmark_routes = require('./move_bookmark')
 
-// Attach routes to specific paths
+//Attach routes to specific paths
 router.use('/export_to_elysian', export_to_elysian_routes);
 router.use('/import_from_elysian', import_from_elysian_routes);
 router.use('/add_bookmark', add_bookmark_routes)
