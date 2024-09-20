@@ -4,7 +4,8 @@
   "description": "A smart bookmark manager",
   "main": "index.js",
   "scripts": {
-    "devStart": "nodemon server.js"
+    "devStart": "nodemon server.js",
+    "start": "node src/server.js"
   },
   "keywords": [],
   "author": "",

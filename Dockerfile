@@ -1,6 +1,7 @@
-FROM node
-WORKDIR /app
-COPY package.json /app
+FROM node:22-alpine
+WORKDIR /Elysian
+COPY package*.json /Elysian
 RUN npm install
-COPY . /app
-CMD ["node","app.js"]
+EXPOSE 6161
+COPY . /Elysian
+CMD ["npm","start"]
