@@ -1,21 +1,27 @@
 {
   "name": "elysian",
-  "version": "1.0.0",
-  "description": "A smart bookmark manager",
-  "main": "index.js",
+  "version": "0.9.0",
+  "description": "A self-hosted tool to backup your regularly used bookmarks from the bookmarks toolbar of your browser to your home lab.",
+  "main": "server.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Aadityajoshi151/Elysian.git"
+  },
   "scripts": {
-    "devStart": "nodemon server.js"
+    "start": "node src/server.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "bookmarks",
+    "selfhosted",
+    "sync",
+    "backup",
+    "homelab"
+  ],
+  "author": "Aaditya Joshi",
+  "license": "MIT",
   "dependencies": {
-    "bcrypt": "^5.1.1",
     "dotenv": "^16.4.5",
-    "express": "^4.19.2",
-    "mongodb": "^6.8.0"
+    "express": "^4.19.2"
   },
-  "devDependencies": {
-    "nodemon": "^3.1.4"
-  }
+  "devDependencies": {}
 }

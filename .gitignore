@@ -1,7 +1,3 @@
 /node_modules
-bookmarks.json
-bookmarks-copy.json
-credentials.json
-flatten.js
 *.env
-/data
+/src/data
