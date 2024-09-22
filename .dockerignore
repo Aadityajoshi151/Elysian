@@ -1,4 +1,5 @@
 /node_modules
 /src/data/*.json
 Dockerfile
-docker-comopse.yaml
+docker-compose.yaml
+/assets
