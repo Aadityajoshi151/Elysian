@@ -1,5 +1,11 @@
-## Elysian
-A self-hosted smart bookmark manager specially designed to sync your regularly used bookmarks from the bookmarks' bar of your browser to your home lab.
+<div align="center" width="100%">
+  <img src="./assets/Elysian_Logo.png" width=150>
+</div>
+<div align="center">
+    <h2>ELYSIAN</h2>
+</div>
+
+A self-hosted tool designed to sync your regularly used bookmarks from the bookmarks' bar of your browser to your home lab.
 
 ### How is it different from other similar services?
 There are numerous other selfhosted services for bookmark management like Linkding, Linkwarden etc.
@@ -13,3 +19,7 @@ Follow the steps mentioned on the [wiki](www.google.com) page to get Elysian up 
 
 ### Future Enhancements
  - Browser extension for Firefox (coming soon)
+ - A server side GUI to see the hierarchical structure of the bookmarks
+ - Button to view diff between browser and server bookmarks
+
+Feel free to open an issue if you come across any bugs or have some feature suggestions.
