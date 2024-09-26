@@ -3,10 +3,8 @@
 </div>
 <div align="center">
     <h2>ELYSIAN</h2>
+    <p>A self-hosted tool designed to sync your regularly used bookmarks from the bookmarks' bar of your browser to your home lab.</p>
 </div>
-
-A self-hosted tool designed to sync your regularly used bookmarks from the bookmarks' bar of your browser to your home lab.
-
 ### How is it different from other similar services?
 There are numerous other selfhosted services for bookmark management like Linkding, Linkwarden etc.
 
