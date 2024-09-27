@@ -15,13 +15,7 @@ app.get('/', function(req, res) {
         res.json(bookmarks)
     }
     catch (error){
-        if (error.code === 'ENOENT') {
-            return res.status(404).send('No bookmarks currently present on Elysian');
-        } else if (error instanceof SyntaxError) {
-            return res.status(500).send('Error parsing JSON file');
-        } else {
-            return res.status(500).send('Error reading file');
-        }
+        return res.status(500).send('Error reading bookmarks file or file not found. If this is a fresh setup of Elysian, please consider exporting your bookmarks to populate the data.');
     }
     
 });
