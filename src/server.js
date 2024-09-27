@@ -4,29 +4,26 @@ const express = require('express');
 const app = express();
 require('dotenv').config()
 const routes = require('./routes');
-const fs = require('fs');
-const path = require('path');
+const readFile = require('./utils/readFile');
 
 app.use('/api', routes);
 
 app.get('/', function(req, res) {
-    const filePath = path.join(__dirname, '..', 'src', 'data', 'bookmarks.json');
-    fs.access(filePath, fs.constants.F_OK, function(err) {
-        if (err) {
-            return res.status(404).send('No bookmarks present on Elysian');
+    try{
+        bookmarks = readFile.readBookmarksFile()
+        bookmarks = JSON.parse(bookmarks)
+        res.json(bookmarks)
+    }
+    catch (error){
+        if (error.code === 'ENOENT') {
+            return res.status(404).send('No bookmarks currently present on Elysian');
+        } else if (error instanceof SyntaxError) {
+            return res.status(500).send('Error parsing JSON file');
+        } else {
+            return res.status(500).send('Error reading file');
         }
-        fs.readFile(filePath, 'utf8', function(err, data) {
-            if (err) {
-                return res.status(500).send('Error reading bookmarks file');
-            }
-            try {
-                const jsonData = JSON.parse(data);
-                res.json(jsonData);
-            } catch (parseError) {
-                res.status(500).send('Error parsing bookmarks file');
-            }
-        });
-    });
+    }
+    
 });
 
 const PORT = 6161;
