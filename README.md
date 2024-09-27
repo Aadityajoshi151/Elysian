@@ -18,7 +18,7 @@ Follow the steps mentioned on the [wiki](https://github.com/Aadityajoshi151/Elys
 
 ### Future Enhancements
  - Browser extension for Firefox (coming soon)
- - A server side GUI to see the hierarchical structure of the bookmarks
+ - A fancy server side GUI to see the hierarchical structure of the bookmarks
  - Button to view diff between browser and server bookmarks
 
 Feel free to open an issue if you come across any bugs or have some feature suggestions.
