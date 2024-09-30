@@ -3,6 +3,8 @@ services:
     Elysian:
         container_name: Elysian
         image: aadityajoshi151/elysian:latest
+        volumes:
+            - ./data:/Elysian/src/data
         env_file:
             - '.env'
         ports:
