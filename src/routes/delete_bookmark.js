@@ -5,6 +5,6 @@ const deleteBookmarkController = require('../controllers/deleteBookmarkControlle
 //Route used when bookmarkis deleted from the browser and sent to server for deletion
 //http://<IP>:6161/api/delete_bookmark
 //REST Verb: DELETE
-router.delete('/', express.json(), deleteBookmarkController.handleDeleteBookmark);
+router.delete('/', express.json({limit: '10mb'}), deleteBookmarkController.handleDeleteBookmark);
 
 module.exports = router;
